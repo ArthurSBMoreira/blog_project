@@ -42,7 +42,7 @@ class DraftListView(LoginRequiredMixin, generic.ListView):
     model = Post
 
     def get_queryset(self):
-        return Post.objects.filter(published_date__isnull=True).order_by('created_date')
+        return Post.objects.filter(published_date__lte=timezone.now()).order_by('created_date')
 
 
 ##########################################################################
@@ -51,7 +51,7 @@ class DraftListView(LoginRequiredMixin, generic.ListView):
 @login_required
 def post_publish(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post.publish
+    post.publish()
     return redirect('post_detail', pk=pk)
 
 @login_required
@@ -67,7 +67,7 @@ def add_comment_to_post(request, pk):
             return redirect('post_detail', pk=post.pk)
     else:
         form = CommentForm()
-    return render(request, 'blog/comment_form.html', {'form', form})
+    return render(request, 'blog/comment_form.html', {'form': form})
 
 @login_required
 def comment_approve(request, pk):
